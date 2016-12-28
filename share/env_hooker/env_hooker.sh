@@ -1,6 +1,8 @@
 # shellcheck shell=bash
 # vi: set ft=sh:
 
+ENV_HOOKER_HOOKS=()
+
 function __env_hooker_command_exists() {
   type -t "$1" >/dev/null
 }
@@ -14,26 +16,14 @@ Usage: register_env_hook <hook_file_name> <hook_function_root>
 EOS
 }
 
-function __env_hooker_add_env_handler() {
-  local -r handler=$1
-
-  if [[ -n "$__ENV_HOOKER_HANDLERS" ]]; then
-    __ENV_HOOKER_HANDLERS="$__ENV_HOOKER_HANDLERS && $handler"
-  else
-    __ENV_HOOKER_HANDLERS=$handler
-  fi
-}
-
 function __env_hooker_run_env_hook {
   local -r hook_file=$1
   local -r hook_function_root=$2
   local -r enter_hook=enter_${hook_function_root}
   local -r exit_hook=exit_${hook_function_root}
   local -r marker=ENV_HOOK_ENTERED_${hook_function_root}
+
   local entered=""
-
-  eval "entered=\$$marker"
-
   local current_dir="$PWD"
 
   until [[ -z "${current_dir}" ]]; do
@@ -47,10 +37,19 @@ function __env_hooker_run_env_hook {
     current_dir="${current_dir%/*}"
   done
 
+  eval "entered=\$$marker"
   if [[ -n "$entered" ]]; then
     eval "unset $marker"
     ${exit_hook}
   fi
+}
+
+function __env_hooker_run_env_hooks {
+  local hook
+
+  for hook in "${ENV_HOOKER_HOOKS[@]}"; do
+    __env_hooker_run_env_hook "${hook}"
+  done
 }
 
 function register_env_hook {
@@ -74,23 +73,13 @@ EOS
     return
   fi
 
-  __env_hooker_add_env_handler "__env_hooker_run_env_hook ${hook_file} ${hook_function_root}"
+  ENV_HOOKER_HOOKS+=("${hook_file} ${hook_function_root}")
 }
 
-function attach_env_hooks() {
-  [[ -z "$__ENV_HOOKER_HANDLERS" ]] && return
-
-  echo "$__ENV_HOOKER_HANDLERS"
-  if [[ -n "$ZSH_VERSION" ]]; then
-    if [[ -n "$__ENV_HOOKER_HANDLERS" ]]; then
-      preexec_functions+=("$__ENV_HOOKER_HANDLERS")
-    fi
-  elif [[ -n "$BASH_VERSION" ]]; then
-    if [[ -n "$__ENV_HOOKER_HANDLERS" ]]; then
-      # shellcheck disable=SC2016
-      prompt_test='[[ "$BASH_COMMAND" != "$PROMPT_COMMAND" ]]'
-      # shellcheck disable=SC2064
-      trap "$prompt_test && $__ENV_HOOKER_HANDLERS" DEBUG
-    fi
+if [[ -n "$ZSH_VERSION" ]]; then
+  if [[ ! "$preexec_functions" == *__env_hooker_run_env_hooks* ]]; then
+    preexec_functions+=("__env_hooker_run_env_hooks")
   fi
-}
+elif [[ -n "$BASH_VERSION" ]]; then
+  trap '[[ "$BASH_COMMAND" != "$PROMPT_COMMAND" ]] && __env_hooker_run_env_hooks' DEBUG
+fi
