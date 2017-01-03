@@ -28,7 +28,7 @@ function tearDown() {
     exited_dummy_directory \
     enter_count \
     exit_count \
-    ENV_HOOK_ENTERED_dummy_project
+    ENV_HOOKER_ENTERED_dummy_project
 }
 
 function test_calls_enter_function_with_directory() {

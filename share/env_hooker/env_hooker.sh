@@ -18,7 +18,7 @@ EOS
 
 function __env_hooker_has_entered_hook() {
   local -r hook_root=${1}
-  local -r marker=ENV_HOOK_ENTERED_${hook_root}
+  local -r marker=ENV_HOOKER_ENTERED_${hook_root}
 
   eval "[[ -n \"\$${marker}\" ]]"
 }
@@ -26,14 +26,14 @@ function __env_hooker_has_entered_hook() {
 function __env_hooker_mark_entered() {
   local -r hook_root=$1
   local -r entered_dir=$2
-  local -r marker=ENV_HOOK_ENTERED_${hook_root}
+  local -r marker=ENV_HOOKER_ENTERED_${hook_root}
 
   eval "${marker}=${entered_dir}"
 }
 
 function __env_hooker_mark_exited() {
   local -r hook_root=${1}
-  local -r marker=ENV_HOOK_ENTERED_${hook_root}
+  local -r marker=ENV_HOOKER_ENTERED_${hook_root}
 
   eval "unset $marker"
 }
