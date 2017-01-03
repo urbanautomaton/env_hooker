@@ -91,7 +91,7 @@ function register_env_hook {
 
   if [[ ! -n "${hook_file}" || ! -n "${hook_function_root}" ]]; then
     __env_hooker_usage
-    return
+    return 1
   fi
 
   if ! __env_hooker_command_exists "${enter_hook}" || ! __env_hooker_command_exists "${exit_hook}"; then
@@ -101,7 +101,7 @@ registering this hook
 
 EOS
     __env_hooker_usage
-    return
+    return 1
   fi
 
   ENV_HOOKER_HOOKS+=("${hook_file} ${hook_function_root}")
