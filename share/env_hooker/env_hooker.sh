@@ -75,6 +75,14 @@ function __env_hooker_run_env_hooks {
   done
 }
 
+function show_env_hooks() {
+  local hook
+
+  for hook in "${ENV_HOOKER_HOOKS[@]}"; do
+    echo "${hook}"
+  done
+}
+
 function register_env_hook {
   local -r hook_file=${1}
   local -r hook_function_root=${2}
