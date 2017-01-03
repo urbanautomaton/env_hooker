@@ -41,6 +41,18 @@ function test_calls_enter_function_with_directory() {
     "${entered_dummy_directory}"
 }
 
+function test_calls_enter_function_with_project_root_if_entered_at_subdir() {
+  local subdir="${test_project_dir}/sub_dir"
+  mkdir -p "$subdir"
+  cd "$subdir" || exit
+  __env_hooker_run_env_hook .dummyproject dummy_project
+
+  assertEquals \
+    "is called with the project root if entered at a subdirectory" \
+    "${test_project_dir}" \
+    "${entered_dummy_directory}"
+}
+
 function test_calls_enter_function_only_once_if_still_inside_project() {
   cd "${test_project_dir}" || exit
   __env_hooker_run_env_hook .dummyproject dummy_project
