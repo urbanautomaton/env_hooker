@@ -24,7 +24,11 @@ function setUp() {
 
 function tearDown() {
   rm -rf "$test_project_dir"
-  unset entered_directory exited_dummy_directory enter_count exit_count
+  unset entered_directory \
+    exited_dummy_directory \
+    enter_count \
+    exit_count \
+    ENV_HOOK_ENTERED_dummy_project
 }
 
 function test_calls_enter_function_with_directory() {

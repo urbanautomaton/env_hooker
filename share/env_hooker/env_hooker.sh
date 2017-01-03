@@ -16,20 +16,41 @@ Usage: register_env_hook <hook_file_name> <hook_function_root>
 EOS
 }
 
+function __env_hooker_has_entered_hook() {
+  local -r hook_root=$1
+  local -r marker=ENV_HOOK_ENTERED_${hook_root}
+
+  eval "[[ -n \"\$$marker\" ]]"
+}
+
+function __env_hooker_mark_entered() {
+  local -r hook_root=$1
+  local -r entered_dir=$2
+  local -r marker=ENV_HOOK_ENTERED_${hook_root}
+
+  eval "${marker}=${entered_dir}"
+}
+
+function __env_hooker_mark_exited() {
+  local -r hook_root=$1
+  local -r marker=ENV_HOOK_ENTERED_${hook_root}
+
+  eval "unset $marker"
+}
+
 function __env_hooker_run_env_hook {
   local -r hook_file=$1
   local -r hook_function_root=$2
   local -r enter_hook=enter_${hook_function_root}
   local -r exit_hook=exit_${hook_function_root}
-  local -r marker=ENV_HOOK_ENTERED_${hook_function_root}
 
-  local entered=""
   local current_dir="$PWD"
 
   until [[ -z "${current_dir}" ]]; do
     if [[ -f "${current_dir}/${hook_file}" ]]; then
-      [[ -n "$entered" ]] && return
-      eval "${marker}=${current_dir}"
+      __env_hooker_has_entered_hook "$hook_function_root" && return
+      __env_hooker_mark_entered "$hook_function_root" "$current_dir"
+
       ${enter_hook} "${current_dir}"
       return
     fi
@@ -37,9 +58,9 @@ function __env_hooker_run_env_hook {
     current_dir="${current_dir%/*}"
   done
 
-  eval "entered=\$$marker"
-  if [[ -n "$entered" ]]; then
-    eval "unset $marker"
+  if __env_hooker_has_entered_hook "$hook_function_root"; then
+    __env_hooker_mark_exited "$hook_function_root"
+
     ${exit_hook}
   fi
 }
