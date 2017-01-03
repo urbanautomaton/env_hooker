@@ -4,7 +4,7 @@
 ENV_HOOKER_HOOKS=()
 
 function __env_hooker_command_exists() {
-  type -t "$1" >/dev/null
+  type -t "${1}" >/dev/null
 }
 
 function __env_hooker_usage() {
@@ -17,10 +17,10 @@ EOS
 }
 
 function __env_hooker_has_entered_hook() {
-  local -r hook_root=$1
+  local -r hook_root=${1}
   local -r marker=ENV_HOOK_ENTERED_${hook_root}
 
-  eval "[[ -n \"\$$marker\" ]]"
+  eval "[[ -n \"\$${marker}\" ]]"
 }
 
 function __env_hooker_mark_entered() {
@@ -32,24 +32,24 @@ function __env_hooker_mark_entered() {
 }
 
 function __env_hooker_mark_exited() {
-  local -r hook_root=$1
+  local -r hook_root=${1}
   local -r marker=ENV_HOOK_ENTERED_${hook_root}
 
   eval "unset $marker"
 }
 
 function __env_hooker_run_env_hook {
-  local -r hook_file=$1
-  local -r hook_function_root=$2
+  local -r hook_file=${1}
+  local -r hook_function_root=${2}
   local -r enter_hook=enter_${hook_function_root}
   local -r exit_hook=exit_${hook_function_root}
 
-  local current_dir="$PWD"
+  local current_dir="${PWD}"
 
   until [[ -z "${current_dir}" ]]; do
     if [[ -f "${current_dir}/${hook_file}" ]]; then
-      __env_hooker_has_entered_hook "$hook_function_root" && return
-      __env_hooker_mark_entered "$hook_function_root" "$current_dir"
+      __env_hooker_has_entered_hook "${hook_function_root}" && return
+      __env_hooker_mark_entered "${hook_function_root}" "${current_dir}"
 
       ${enter_hook} "${current_dir}"
       return
@@ -58,8 +58,8 @@ function __env_hooker_run_env_hook {
     current_dir="${current_dir%/*}"
   done
 
-  if __env_hooker_has_entered_hook "$hook_function_root"; then
-    __env_hooker_mark_exited "$hook_function_root"
+  if __env_hooker_has_entered_hook "${hook_function_root}"; then
+    __env_hooker_mark_exited "${hook_function_root}"
 
     ${exit_hook}
   fi
@@ -74,12 +74,12 @@ function __env_hooker_run_env_hooks {
 }
 
 function register_env_hook {
-  local -r hook_file=$1
-  local -r hook_function_root=$2
+  local -r hook_file=${1}
+  local -r hook_function_root=${2}
   local -r enter_hook=enter_${hook_function_root}
   local -r exit_hook=exit_${hook_function_root}
 
-  if [[ ! -n "$hook_file" || ! -n "$hook_function_root" ]]; then
+  if [[ ! -n "${hook_file}" || ! -n "${hook_function_root}" ]]; then
     __env_hooker_usage
     return
   fi
@@ -97,10 +97,10 @@ EOS
   ENV_HOOKER_HOOKS+=("${hook_file} ${hook_function_root}")
 }
 
-if [[ -n "$ZSH_VERSION" ]]; then
-  if [[ ! "$preexec_functions" == *__env_hooker_run_env_hooks* ]]; then
+if [[ -n "${ZSH_VERSION}" ]]; then
+  if [[ ! "${preexec_functions}" == *__env_hooker_run_env_hooks* ]]; then
     preexec_functions+=("__env_hooker_run_env_hooks")
   fi
-elif [[ -n "$BASH_VERSION" ]]; then
-  trap '[[ "$BASH_COMMAND" != "$PROMPT_COMMAND" ]] && __env_hooker_run_env_hooks' DEBUG
+elif [[ -n "${BASH_VERSION}" ]]; then
+  trap '[[ "${BASH_COMMAND}" != "${PROMPT_COMMAND}" ]] && __env_hooker_run_env_hooks' DEBUG
 fi
