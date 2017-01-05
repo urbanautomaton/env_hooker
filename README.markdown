@@ -111,56 +111,7 @@ resource. You can test bash scripts! Who knew?)
 
 ## Similar projects
 
-### direnv
-
-[direnv](https://github.com/direnv/direnv) is very similar to
-env_hooker, but works by executing the contents of a `.envrc` file, if
-one is present.
-
-env_hooker only ever directly executes code you control - direnv, by
-contrast, maintains a whitelist of known `.envrc` files to protect
-against malicious code execution, e.g. when cloning a repo containing an
-unknown `.envrc` file.
-
-direnv hooks in by adding a function call to `$PROMPT_COMMAND` - this is
-a special bash variable whose contents are executed every time the
-prompt is rendered. This means that direnv hooks will only work in
-interactive shells.
-
-direnv provides a lot of convenience functions and has some built-in
-project layouts for various languages, whereas with env_hooker it's up
-to you to write your own "prepend to path" helpers, for example.
-
-Really these projects are very similar - I like mine because:
-
-* I know how it works
-* It hooks in via a DEBUG trap, so works in non-interactive shells
-* I already had a bunch of shell helpers
-* I didn't have to learn a new DSL
-
-Reasons you might prefer direnv:
-
-* a bunch of people use it
-* the project layouts match your needs
-* the DSL saves you doing a bunch of shell scripting
-* the automated teardown saves you some time
-
-All of which are very reasonable reasons.
-
-### autoenv
-
-[autoenv](https://github.com/kennethreitz/autoenv) is another very
-similar project allowing the execution of custom hook code during setup.
-It doesn't support teardown.
-
-The hook code is stored in a `.env` file within the project, and it has
-a whitelist-based security mechanism like direnv.
-
-It hooks in by overriding `cd`, which I have no strong opinion about. If
-you'd like a strong opinion about this, I believe the internet contains
-several.
-
-### Environment modules
-
-Apparently [this is a similar thing](http://modules.sourceforge.net/). I
-don't know exactly what sort of thing.
+See my [rambly release
+article](http://urbanautomaton.com/blog/2017/01/05/envhooker-a-tiny-shell-environment-switcher/)
+for a discussion of alternative projects that you should almost
+certainly prefer to this one.
