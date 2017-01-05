@@ -26,7 +26,46 @@ based on the presence of a `.ruby-version` file.
 
 ## Installation
 
-TODO
+Installation is still pretty basic. First clone the repo:
+
+```
+$ git clone https://github.com/urbanautomaton/env_hooker
+$ cd env_hooker
+```
+
+Then:
+
+```
+# installs to /usr/local/share/env_hooker/env_hooker.sh
+$ make install
+```
+
+Optionally specify `PREFIX` (default: `/usr/local`) to control
+installation location:
+
+```
+# installs to /opt/share/env_hooker/env_hooker.sh
+$ PREFIX=/opt make install
+```
+
+Then source the file in your .bashrc (or wherever) and start defining
+hooks:
+
+```bash
+# ~/.bashrc
+
+. /usr/local/share/env_hooker/env_hooker.sh
+
+function enter_some_project_type() {
+  # ...
+}
+
+function exit_some_project_type() {
+  # ...
+}
+
+register_env_hook .somehookfile some_project_type
+```
 
 ## Usage
 
