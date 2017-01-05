@@ -6,13 +6,14 @@ env_hooker is a shell environment switcher, similar to
 
 It helps to solve problems of the following type:
 
-* I enter a ruby project directory. I want to switch to a
-  project-specific ruby version, and set up a custom gem installation
-  location.
-* I enter a golang project directory. I want `GOPATH` and `PATH` set up
-  to reflect this location.
-* I enter a node project directory. I want
-  `/path/to/project/.node_modules/bin` added to my `PATH`.
+> I've `cd`'d to a directory containing a node project. I'd like to add
+> `.node_modules/bin` to my `PATH`.
+
+or
+
+> I've `cd`'d to a directory containing a ruby project. I'd like to
+> switch to the correct ruby version for the project, and set up gems
+> to install and run from a project-specific location.
 
 In each case we want to modify the shell environment to support a
 particular project type's workflow. When we enter the project directory,
