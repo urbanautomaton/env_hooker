@@ -71,7 +71,7 @@ function __env_hooker_run_env_hooks {
   local hook
 
   for hook in "${ENV_HOOKER_HOOKS[@]}"; do
-    __env_hooker_run_env_hook "${hook}"
+    __env_hooker_run_env_hook ${hook}
   done
 }
 
