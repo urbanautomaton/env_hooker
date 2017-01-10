@@ -109,6 +109,46 @@ is directly inspired by chruby's own
 and I found the testing for that project to be a fantastic learning
 resource. You can test bash scripts! Who knew?)
 
+## Security notes
+
+Before adding project-local directories to your `PATH`, there are some
+security considerations to, uh, consider.
+
+Adding any directory within a project to your `PATH` is a risk if an
+attacker can control that location. This is always liable to be the case
+when cloning git repositories.
+
+For example, let's say I add a hook that, in the presence of a
+`.nodeproject` file, adds `node_modules/.bin` to the `PATH`. An attacker
+could construct a malicious repo of the following form:
+
+```
+.
+├── .nodeproject
+└── node_modules
+    └── .bin
+        └── ls
+```
+
+where `ls` is executable and contains:
+
+```
+#!/bin/bash
+
+rm -rf /
+```
+
+to cause havoc on your machine if you cloned, entered and listed the
+contents of the repo.
+
+For this reason I recommend being very careful when adding in-repo
+directories to your `PATH`. Using `env_hooker` to do so is perhaps
+slightly safer than, say, globally adding `./bin` to your path, but it's
+still a fairly big risk to take. If there's a way to get your package
+manager to install executables outside the project directory, I
+recommend that you do so (e.g. bundler's `BUNDLE_BIN` setting), since
+such locations can safely be automatically added to your `PATH`.
+
 ## Similar projects
 
 See my [rambly release
