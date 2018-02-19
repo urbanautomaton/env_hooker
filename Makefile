@@ -6,10 +6,12 @@ PREFIX?=/usr/local
 
 .PHONY: test install
 
-install:
-	for dir in $(INSTALL_DIRS); do mkdir -p $(DESTDIR)$(PREFIX)/$$dir; done
-	for file in $(INSTALL_FILES); do cp $$file $(DESTDIR)$(PREFIX)/$$file; done
+default: test
 
 test:
 	SHELL=`command -v bash` ./test/runner
 	SHELL=`command -v zsh` ./test/runner
+
+install:
+	for dir in $(INSTALL_DIRS); do mkdir -p $(DESTDIR)$(PREFIX)/$$dir; done
+	for file in $(INSTALL_FILES); do cp $$file $(DESTDIR)$(PREFIX)/$$file; done
